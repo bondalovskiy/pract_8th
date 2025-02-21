@@ -1,9 +1,9 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/pract_8th_user-service
+    url: jdbc:postgresql://localhost:5432/pract_8th_product-service
     username: postgres
     password: bondalovskiy
     driver-class-name: org.postgresql.Driver
