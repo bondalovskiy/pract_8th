@@ -1,10 +1,10 @@
-package com.bndlvsk.pract_8th;
+package com.bndlvsk.userservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Pract8thApplicationTests {
+class UserServiceApplicationTests {
 
     @Test
     void contextLoads() {

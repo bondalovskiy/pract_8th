@@ -1,13 +1,13 @@
-package com.bndlvsk.pract_8th;
+package com.bndlvsk.userservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Pract8thApplication {
+public class UserServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Pract8thApplication.class, args);
+        SpringApplication.run(UserServiceApplication.class, args);
     }
 
 }
