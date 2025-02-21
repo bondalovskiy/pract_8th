@@ -15,23 +15,23 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "product_id", nullable = false)
+    @Column(name = "product_id", nullable = false)
     private Long productId;
 
     @Column(nullable = false)
     private Integer quantity;
 
-    @Setter
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    /*    public void setOrder(Order order) {
+    public void setOrder(Order order) {
         if (this.order != null) {
             this.order.getOrderItems().remove(this); //del связь с предыдущим Order
         }
         this.order = order;
         if (order != null) {
             order.getOrderItems().add(this); //add связь с новым Order
-        }*/
+        }
+    }
 }
