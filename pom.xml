@@ -16,6 +16,10 @@
     <name>pract_8th</name>
     <description>pract_8th</description>
 
+    <modules>
+        <module>user-service</module>
+    </modules>
+
     <url/>
     <licenses>
         <license/>
