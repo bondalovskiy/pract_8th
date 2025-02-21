@@ -15,6 +15,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>pract_8th</name>
     <description>pract_8th</description>
+    <packaging>pom</packaging>
+
 
     <modules>
         <module>user-service</module>
