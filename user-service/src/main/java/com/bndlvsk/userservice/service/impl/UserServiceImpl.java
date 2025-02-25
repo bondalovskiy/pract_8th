@@ -1,26 +1,27 @@
-package service.impl;
+package com.bndlvsk.userservice.service.impl;
 
 import com.bndlvsk.userservice.dto.request.UserCreateRequest;
 import com.bndlvsk.userservice.dto.request.UserUpdateRequest;
 import com.bndlvsk.userservice.dto.response.UserResponse;
-import com.bndlvsk.userservice.exceprion.*;
+import com.bndlvsk.userservice.exception.DuplicateFoundException;
+import com.bndlvsk.userservice.exception.ResourceNotFoundException;
+import com.bndlvsk.userservice.exception.ValidationException;
 import com.bndlvsk.userservice.mapper.UserMapper;
 import com.bndlvsk.userservice.model.Role;
 import com.bndlvsk.userservice.model.RoleType;
 import com.bndlvsk.userservice.model.User;
 import com.bndlvsk.userservice.repository.RoleRepository;
 import com.bndlvsk.userservice.repository.UserRepository;
-import static com.bndlvsk.userservice.util.ErrorMessage.*;
+import com.bndlvsk.userservice.service.UserService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import service.UserService;
-
 import java.util.List;
+
+import static com.bndlvsk.userservice.util.ErrorMessage.*;
 
 @Service
 @RequiredArgsConstructor

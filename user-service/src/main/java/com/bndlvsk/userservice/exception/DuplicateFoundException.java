@@ -1,4 +1,4 @@
-package com.bndlvsk.userservice.exceprion;
+package com.bndlvsk.userservice.exception;
 
 public class DuplicateFoundException extends RuntimeException{
 
