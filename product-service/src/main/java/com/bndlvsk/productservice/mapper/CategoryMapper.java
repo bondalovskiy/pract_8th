@@ -13,7 +13,6 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CategoryMapper {
-    @Mapping(target = "product", ignore = true)
     Category createRequestToEntity(CategoryCreateRequest categoryCreateRequest);
 
     void updateCategoryFromUpdateRequest(CategoryUpdateRequest categoryUpdateRequest, @MappingTarget Category category);

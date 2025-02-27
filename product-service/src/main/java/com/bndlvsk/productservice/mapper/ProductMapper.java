@@ -12,7 +12,6 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProductMapper {
     @Mapping(target = "category", ignore = true)
-    @Mapping(target = "orderItems", ignore = true)
     Product createRequestToEntity(ProductCreateRequest productCreateRequest);
 
     void updateProductFromUpdateRequest(ProductUpdateRequest productUpdateRequest, @MappingTarget Product product);
