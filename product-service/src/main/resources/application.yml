@@ -2,6 +2,8 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: product-service
   datasource:
     url: jdbc:postgresql://localhost:5432/pract_8th_product-service
     username: postgres
