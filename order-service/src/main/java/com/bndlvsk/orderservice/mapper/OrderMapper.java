@@ -13,11 +13,11 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OrderMapper {
-    @Mapping(target = "user", ignore = true)
+    //@Mapping(target = "user", ignore = true)
     Order createRequestToEntity(OrderCreateRequest orderCreateRequest);
 
     void updateOrderFromUpdateRequest(OrderUpdateRequest orderUpdateRequest, @MappingTarget Order order);
 
-    @Mapping(source = "order.user.id", target = "userId")
+    //@Mapping(source = "order.user.id", target = "userId")
     OrderResponse toResponse(Order order);
 }

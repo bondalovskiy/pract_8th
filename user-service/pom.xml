@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.bndlvsk</groupId>
-    <artifactId>product-service</artifactId>
+    <artifactId>user-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>product-service</name>
-    <description>product-service</description>
+    <name>user-service</name>
+    <description>user-service</description>
     <url/>
     <licenses>
         <license/>
