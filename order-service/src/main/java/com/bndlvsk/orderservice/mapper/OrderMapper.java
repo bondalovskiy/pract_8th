@@ -4,20 +4,16 @@ import com.bndlvsk.orderservice.dto.request.OrderCreateRequest;
 import com.bndlvsk.orderservice.dto.request.OrderUpdateRequest;
 import com.bndlvsk.orderservice.dto.response.OrderResponse;
 import com.bndlvsk.orderservice.model.Order;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.MappingTarget;
-
+import org.mapstruct.*;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OrderMapper {
-    //@Mapping(target = "user", ignore = true)
+
+    @Mapping(target = "orderItems", source = "items")
     Order createRequestToEntity(OrderCreateRequest orderCreateRequest);
 
     void updateOrderFromUpdateRequest(OrderUpdateRequest orderUpdateRequest, @MappingTarget Order order);
 
-    //@Mapping(source = "order.user.id", target = "userId")
+    @Mapping(target = "items", source = "orderItems")
     OrderResponse toResponse(Order order);
 }

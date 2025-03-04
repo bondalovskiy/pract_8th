@@ -1,25 +1,29 @@
 package com.bndlvsk.orderservice.service;
 
 import com.bndlvsk.orderservice.dto.request.OrderCreateRequest;
-import com.bndlvsk.orderservice.dto.request.OrderItemCreateRequest;
 import com.bndlvsk.orderservice.dto.request.OrderUpdateRequest;
+import com.bndlvsk.orderservice.dto.request.OrderItemCreateRequest;
+import com.bndlvsk.orderservice.dto.request.OrderItemUpdateRequest;
 import com.bndlvsk.orderservice.dto.response.OrderResponse;
+import com.bndlvsk.orderservice.dto.response.OrderItemResponse;
 
 import java.util.List;
 
 public interface OrderService {
 
-    OrderResponse createOrder(OrderCreateRequest createOrderRequest);
+    OrderResponse createOrder(OrderCreateRequest request);
 
-    OrderResponse updateOrder(Long orderId, OrderUpdateRequest updateOrderRequest);
+    OrderResponse updateOrder(Long orderId, OrderUpdateRequest request);
 
-    void deleteOrder(Long id);
+    void deleteOrder(Long orderId);
 
-    OrderResponse getOrderById(Long id);
+    OrderResponse getOrderById(Long orderId);
 
     List<OrderResponse> getAllOrders();
 
-    void addOrderItem(Long orderId, OrderItemCreateRequest orderItemCreateRequest);
+    OrderItemResponse addOrderItem(Long orderId, OrderItemCreateRequest request);
 
-    void addOrderItems(Long orderId, List<OrderItemCreateRequest> orderItemCreateRequests);
+    OrderItemResponse updateOrderItem(Long orderItemId, OrderItemUpdateRequest request);
+
+    void deleteOrderItem(Long orderItemId);
 }

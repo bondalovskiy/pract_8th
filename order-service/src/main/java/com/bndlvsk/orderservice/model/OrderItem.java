@@ -20,17 +20,17 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     public void setOrder(Order order) {
         if (this.order != null) {
-            this.order.getOrderItems().remove(this); //del связь с предыдущим Order
+            this.order.getOrderItems().remove(this);
         }
         this.order = order;
-        if (order != null) {
-            order.getOrderItems().add(this); //add связь с новым Order
+        if (order != null && !order.getOrderItems().contains(this)) {
+            order.getOrderItems().add(this);
         }
     }
 }
