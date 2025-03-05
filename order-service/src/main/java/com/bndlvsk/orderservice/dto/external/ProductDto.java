@@ -1,7 +1,5 @@
 package com.bndlvsk.orderservice.dto.external;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
 
 public record ProductDto(

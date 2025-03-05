@@ -9,7 +9,7 @@ import org.mapstruct.*;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OrderMapper {
 
-    @Mapping(target = "orderItems", source = "items")
+    //@Mapping(target = "orderItems", source = "items")
     Order createRequestToEntity(OrderCreateRequest orderCreateRequest);
 
     void updateOrderFromUpdateRequest(OrderUpdateRequest orderUpdateRequest, @MappingTarget Order order);
