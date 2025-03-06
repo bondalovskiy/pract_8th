@@ -1,6 +1,5 @@
 package com.bndlvsk.userservice.service;
 
-import com.bndlvsk.userservice.dto.request.UserCreateRequest;
 import com.bndlvsk.userservice.dto.request.UserUpdateRequest;
 import com.bndlvsk.userservice.dto.request.SignUpRequest;
 import com.bndlvsk.userservice.dto.response.UserResponse;

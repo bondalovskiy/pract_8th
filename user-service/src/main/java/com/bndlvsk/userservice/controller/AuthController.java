@@ -36,7 +36,6 @@ public class AuthController {
     ) {
         UserResponse newUser = userService.createUser(request);
         
-        // Authenticate the user after successful registration
         final UserDetails userDetails = userDetailsService.loadUserByUsername(newUser.login());
         final String jwt = jwtUtil.generateToken(userDetails);
 
