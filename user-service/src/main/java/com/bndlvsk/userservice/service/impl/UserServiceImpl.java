@@ -1,6 +1,6 @@
 package com.bndlvsk.userservice.service.impl;
 
-import com.bndlvsk.userservice.dto.request.UserCreateRequest;
+import com.bndlvsk.userservice.dto.request.SignUpRequest;
 import com.bndlvsk.userservice.dto.request.UserUpdateRequest;
 import com.bndlvsk.userservice.dto.response.UserResponse;
 import com.bndlvsk.userservice.exception.DuplicateFoundException;
@@ -34,13 +34,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse createUser(UserCreateRequest createUserRequest) {
-        checkCreateUserData(createUserRequest);
+    public UserResponse createUser(SignUpRequest signUpRequest) {
+        validatePassword(signUpRequest.password(), signUpRequest.confirmPassword());
+        checkCreateUserData(signUpRequest);
+        
         Role customerRole = roleRepository.findByName(RoleType.CUSTOMER)
-                   .orElseThrow(() -> new ResourceNotFoundException(String.format(NOT_FOUND_MESSAGE, "Role", createUserRequest.name())));
-        User user = userMapper.createRequestToEntity(createUserRequest);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(NOT_FOUND_MESSAGE, "Role", RoleType.CUSTOMER)));
+
+        User user = userMapper.signUpRequestToEntity(signUpRequest);
+        user.setPassword(passwordEncoder.encode(signUpRequest.password()));
         user.setRole(customerRole);
+        
         return userMapper.toResponse(userRepository.save(user));
     }
 
@@ -70,16 +74,15 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
-    private void checkCreateUserData(UserCreateRequest createUserRequest){
-        validatePassword(createUserRequest.password(), createUserRequest.confirmPassword());
-        if (userRepository.existsByLogin(createUserRequest.login())) {
-            throw new DuplicateFoundException(String.format(ALREADY_USED_MESSAGE, createUserRequest.login()));
+    private void checkCreateUserData(SignUpRequest signUpRequest) {
+        if (userRepository.existsByLogin(signUpRequest.login())) {
+            throw new DuplicateFoundException(String.format(ALREADY_USED_MESSAGE, signUpRequest.login()));
         }
-        if (userRepository.existsByEmail(createUserRequest.email())) {
-            throw new DuplicateFoundException(String.format(ALREADY_USED_MESSAGE, createUserRequest.email()));
+        if (userRepository.existsByEmail(signUpRequest.email())) {
+            throw new DuplicateFoundException(String.format(ALREADY_USED_MESSAGE, signUpRequest.email()));
         }
-        if (userRepository.existsByPhone(createUserRequest.phone())) {
-            throw new DuplicateFoundException(String.format(ALREADY_USED_MESSAGE, createUserRequest.phone()));
+        if (userRepository.existsByPhone(signUpRequest.phone())) {
+            throw new DuplicateFoundException(String.format(ALREADY_USED_MESSAGE, signUpRequest.phone()));
         }
     }
 

@@ -2,8 +2,11 @@ package com.bndlvsk.userservice.controller;
 
 import com.bndlvsk.userservice.config.JwtProperties;
 import com.bndlvsk.userservice.dto.request.AuthenticationRequest;
+import com.bndlvsk.userservice.dto.request.SignUpRequest;
 import com.bndlvsk.userservice.dto.response.AuthenticationResponse;
+import com.bndlvsk.userservice.dto.response.UserResponse;
 import com.bndlvsk.userservice.security.JwtUtil;
+import com.bndlvsk.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,20 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final JwtProperties jwtProperties;
+    private final UserService userService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<AuthenticationResponse> signUp(
+            @RequestBody @Valid SignUpRequest request
+    ) {
+        UserResponse newUser = userService.createUser(request);
+        
+        // Authenticate the user after successful registration
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(newUser.login());
+        final String jwt = jwtUtil.generateToken(userDetails);
+
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, jwtProperties.getTokenPrefix()));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(

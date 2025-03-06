@@ -1,5 +1,6 @@
 package com.bndlvsk.userservice.mapper;
 
+import com.bndlvsk.userservice.dto.request.SignUpRequest;
 import com.bndlvsk.userservice.dto.request.UserCreateRequest;
 import com.bndlvsk.userservice.dto.request.UserUpdateRequest;
 import com.bndlvsk.userservice.dto.response.UserResponse;
@@ -11,6 +12,10 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    User signUpRequestToEntity(SignUpRequest signUpRequest);
 
     @Mapping(target = "role", ignore = true)
     User createRequestToEntity(UserCreateRequest userCreateRequest);
