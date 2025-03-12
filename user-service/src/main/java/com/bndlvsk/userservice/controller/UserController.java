@@ -1,6 +1,6 @@
 package com.bndlvsk.userservice.controller;
 
-import com.bndlvsk.userservice.dto.request.UserCreateRequest;
+import com.bndlvsk.userservice.dto.request.SignUpRequest;
 import com.bndlvsk.userservice.dto.request.UserUpdateRequest;
 import com.bndlvsk.userservice.dto.response.UserResponse;
 import com.bndlvsk.userservice.service.UserService;
@@ -19,8 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserResponse createUser(@RequestBody @Valid UserCreateRequest userCreateRequest) {
-        return userService.createUser(userCreateRequest);
+    public UserResponse createUser(@RequestBody @Valid SignUpRequest signUpRequest) {
+        return userService.createUser(signUpRequest);
     }
 
     @PutMapping("/{id}")
