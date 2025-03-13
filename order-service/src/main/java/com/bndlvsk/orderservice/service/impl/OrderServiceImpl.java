@@ -14,6 +14,7 @@ import com.bndlvsk.orderservice.model.OrderItem;
 import com.bndlvsk.orderservice.repository.OrderRepository;
 import com.bndlvsk.orderservice.repository.OrderItemRepository;
 import com.bndlvsk.orderservice.service.OrderService;
+import com.bndlvsk.orderservice.service.OrderEventProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemMapper orderItemMapper;
     private final UserClient userClient;
     private final ProductClient productClient;
+    private final OrderEventProducer orderEventProducer;
 
     @Override
     public OrderResponse createOrder(OrderCreateRequest request) {
@@ -57,15 +59,25 @@ public class OrderServiceImpl implements OrderService {
 
 
         order.setPrice(totalPrice);
-
-        return orderMapper.toResponse(orderRepository.save(order));
+        
+        Order savedOrder = orderRepository.save(order);
+        
+        // Publish order created event
+        orderEventProducer.publishOrderCreated(savedOrder);
+        
+        return orderMapper.toResponse(savedOrder);
     }
 
     @Override
     public OrderResponse updateOrder(Long orderId, OrderUpdateRequest request) {
         Order order = getOrderOrThrow(orderId);
         orderMapper.updateOrderFromUpdateRequest(request, order);
-        return orderMapper.toResponse(orderRepository.save(order));
+        Order savedOrder = orderRepository.save(order);
+        
+        // Publish order updated event
+        orderEventProducer.publishOrderUpdated(savedOrder);
+        
+        return orderMapper.toResponse(savedOrder);
     }
 
     @Override
@@ -74,6 +86,9 @@ public class OrderServiceImpl implements OrderService {
             throw new ResourceNotFoundException(String.format(NOT_FOUND_MESSAGE, "Order", orderId));
         }
         orderRepository.deleteById(orderId);
+        
+        // Publish order deleted event
+        orderEventProducer.publishOrderDeleted(orderId);
     }
 
     @Override
