@@ -14,6 +14,7 @@ import com.bndlvsk.orderservice.model.OrderItem;
 import com.bndlvsk.orderservice.repository.OrderRepository;
 import com.bndlvsk.orderservice.repository.OrderItemRepository;
 import com.bndlvsk.orderservice.service.OrderService;
+import com.bndlvsk.orderservice.service.KafkaProducerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,15 +35,14 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemMapper orderItemMapper;
     private final UserClient userClient;
     private final ProductClient productClient;
+    private final KafkaProducerService kafkaProducerService;
 
     @Override
     public OrderResponse createOrder(OrderCreateRequest request) {
-
         //userClient.checkUserExists(request.userId());
 
         BigDecimal totalPrice = BigDecimal.ZERO;
         Order order = orderMapper.createRequestToEntity(request);
-
 
         for (OrderItemCreateRequest itemRequest : request.items()) {
             OrderItem orderItem = orderItemMapper.createRequestToEntity(itemRequest);
@@ -55,17 +55,25 @@ public class OrderServiceImpl implements OrderService {
             totalPrice = totalPrice.add(itemPrice);
         }
 
-
         order.setPrice(totalPrice);
-
-        return orderMapper.toResponse(orderRepository.save(order));
+        Order savedOrder = orderRepository.save(order);
+        
+        // Send order created event
+        kafkaProducerService.sendOrderEvent("ORDER_CREATED", orderMapper.toResponse(savedOrder));
+        
+        return orderMapper.toResponse(savedOrder);
     }
 
     @Override
     public OrderResponse updateOrder(Long orderId, OrderUpdateRequest request) {
         Order order = getOrderOrThrow(orderId);
         orderMapper.updateOrderFromUpdateRequest(request, order);
-        return orderMapper.toResponse(orderRepository.save(order));
+        Order updatedOrder = orderRepository.save(order);
+        
+        // Send order updated event
+        kafkaProducerService.sendOrderEvent("ORDER_UPDATED", orderMapper.toResponse(updatedOrder));
+        
+        return orderMapper.toResponse(updatedOrder);
     }
 
     @Override
@@ -73,7 +81,15 @@ public class OrderServiceImpl implements OrderService {
         if (!orderRepository.existsById(orderId)) {
             throw new ResourceNotFoundException(String.format(NOT_FOUND_MESSAGE, "Order", orderId));
         }
+        
+        // Get order details before deletion for the event
+        Order order = getOrderOrThrow(orderId);
+        OrderResponse orderResponse = orderMapper.toResponse(order);
+        
         orderRepository.deleteById(orderId);
+        
+        // Send order deleted event
+        kafkaProducerService.sendOrderEvent("ORDER_DELETED", orderResponse);
     }
 
     @Override
@@ -93,7 +109,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderItemResponse addOrderItem(Long orderId, OrderItemCreateRequest request) {
         Order order = getOrderOrThrow(orderId);
-
 
         //productClient.checkProductExists(request.productId());
 
