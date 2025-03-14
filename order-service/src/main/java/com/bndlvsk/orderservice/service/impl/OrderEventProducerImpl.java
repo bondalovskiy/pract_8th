@@ -22,13 +22,13 @@ public class OrderEventProducerImpl implements OrderEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    @Value("${kafka.topic.order-created:order-created}")
+    @Value("${kafka.topic.order-created:pizza-order-created}")
     private String orderCreatedTopic;
 
-    @Value("${kafka.topic.order-updated:order-updated}")
+    @Value("${kafka.topic.order-updated:pizza-order-updated}")
     private String orderUpdatedTopic;
 
-    @Value("${kafka.topic.order-deleted:order-deleted}")
+    @Value("${kafka.topic.order-deleted:pizza-order-deleted}")
     private String orderDeletedTopic;
 
     @Override

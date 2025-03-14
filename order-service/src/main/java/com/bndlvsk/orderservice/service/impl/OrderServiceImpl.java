@@ -16,6 +16,7 @@ import com.bndlvsk.orderservice.repository.OrderItemRepository;
 import com.bndlvsk.orderservice.service.OrderService;
 import com.bndlvsk.orderservice.service.OrderEventProducer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ import static com.bndlvsk.orderservice.util.ErrorMessages.NOT_FOUND_MESSAGE;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -39,12 +41,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse createOrder(OrderCreateRequest request) {
-
         //userClient.checkUserExists(request.userId());
 
         BigDecimal totalPrice = BigDecimal.ZERO;
         Order order = orderMapper.createRequestToEntity(request);
-
 
         for (OrderItemCreateRequest itemRequest : request.items()) {
             OrderItem orderItem = orderItemMapper.createRequestToEntity(itemRequest);
@@ -56,7 +56,6 @@ public class OrderServiceImpl implements OrderService {
             BigDecimal itemPrice = product.price().multiply(BigDecimal.valueOf(item.quantity()));
             totalPrice = totalPrice.add(itemPrice);
         }
-
 
         order.setPrice(totalPrice);
         
@@ -85,6 +84,10 @@ public class OrderServiceImpl implements OrderService {
         if (!orderRepository.existsById(orderId)) {
             throw new ResourceNotFoundException(String.format(NOT_FOUND_MESSAGE, "Order", orderId));
         }
+        
+        // Get the order before deletion to have its data for the event
+        Order order = getOrderOrThrow(orderId);
+        
         orderRepository.deleteById(orderId);
         
         // Publish order deleted event
@@ -109,14 +112,17 @@ public class OrderServiceImpl implements OrderService {
     public OrderItemResponse addOrderItem(Long orderId, OrderItemCreateRequest request) {
         Order order = getOrderOrThrow(orderId);
 
-
         //productClient.checkProductExists(request.productId());
 
         OrderItem orderItem = orderItemMapper.createRequestToEntity(request);
         orderItem.setOrder(order);
         order.getOrderItems().add(orderItem);
 
-        orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        
+        // Publish order updated event
+        orderEventProducer.publishOrderUpdated(savedOrder);
+        
         return orderItemMapper.toResponse(orderItem);
     }
 
@@ -124,28 +130,34 @@ public class OrderServiceImpl implements OrderService {
     public OrderItemResponse updateOrderItem(Long orderItemId, OrderItemUpdateRequest request) {
         OrderItem orderItem = getOrderItemOrThrow(orderItemId);
         orderItemMapper.updateOrderItemFromUpdateRequest(request, orderItem);
-        return orderItemMapper.toResponse(orderItemRepository.save(orderItem));
+        OrderItem savedOrderItem = orderItemRepository.save(orderItem);
+        
+        // Publish order updated event for the parent order
+        orderEventProducer.publishOrderUpdated(savedOrderItem.getOrder());
+        
+        return orderItemMapper.toResponse(savedOrderItem);
     }
 
     @Override
     public void deleteOrderItem(Long orderItemId) {
-        if (!orderItemRepository.existsById(orderItemId)) {
-            throw new ResourceNotFoundException(String.format(NOT_FOUND_MESSAGE, "OrderItem", orderItemId));
-        }
+        OrderItem orderItem = getOrderItemOrThrow(orderItemId);
+        Order parentOrder = orderItem.getOrder();
+        
         orderItemRepository.deleteById(orderItemId);
+        
+        // Publish order updated event for the parent order
+        orderEventProducer.publishOrderUpdated(parentOrder);
     }
 
     private Order getOrderOrThrow(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format(NOT_FOUND_MESSAGE, "Order", orderId))
-                );
+                        String.format(NOT_FOUND_MESSAGE, "Order", orderId)));
     }
 
     private OrderItem getOrderItemOrThrow(Long orderItemId) {
         return orderItemRepository.findById(orderItemId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format(NOT_FOUND_MESSAGE, "OrderItem", orderItemId))
-                );
+                        String.format(NOT_FOUND_MESSAGE, "OrderItem", orderItemId)));
     }
 }

@@ -18,4 +18,9 @@ public interface ProductService {
 
     List<ProductResponse> getAllProducts();
 
+    // Order event handling methods
+    void handleOrderCreated(Long productId, Integer quantity);
+    void handleOrderUpdated(Long productId, Integer quantity);
+    void handleOrderDeleted(Long productId, Integer quantity);
+
 }
